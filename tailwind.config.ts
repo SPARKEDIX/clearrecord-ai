@@ -1,6 +1,12 @@
 import type { Config } from "tailwindcss";
 
+// CSS-variable backed colors so the light/dark toggle works without
+// rewriting every component. Opacity modifiers (e.g. `text-white/60`)
+// keep working via Tailwind's <alpha-value> placeholder.
+const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`;
+
 const config: Config = {
+  darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
@@ -8,8 +14,9 @@ const config: Config = {
         primary: "#1DB954",
         secondary: "#191414",
         accent: "#1ED760",
-        background: "#121212",
-        surface: "#181818",
+        background: withAlpha("--color-background"),
+        surface: withAlpha("--color-surface"),
+        white: withAlpha("--color-ink"),
         danger: "#FF4444",
         warning: "#FFC107"
       },
@@ -27,3 +34,4 @@ const config: Config = {
 };
 
 export default config;
+

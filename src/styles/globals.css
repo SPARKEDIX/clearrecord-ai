@@ -2,14 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Theme tokens. Default (:root) = dark Spotify palette.
+ * `.light` on <html> switches to the PRD light tokens
+ * (Background #FFFFFF, Surface #F5F5F5, Text #121212).
+ * `.force-dark` locks a subtree (header/footer) to dark in both modes.
+ */
 :root {
   color-scheme: dark;
+  --color-background: 18 18 18;
+  --color-surface: 24 24 24;
+  --color-ink: 255 255 255;
+}
+
+.light {
+  color-scheme: light;
+  --color-background: 255 255 255;
+  --color-surface: 245 245 245;
+  --color-ink: 18 18 18;
+}
+
+.force-dark {
+  color-scheme: dark;
+  --color-background: 18 18 18;
+  --color-surface: 24 24 24;
+  --color-ink: 255 255 255;
 }
 
 html,
 body {
-  background-color: #121212;
-  color: #ffffff;
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-ink));
 }
 
 ::selection {
@@ -18,16 +41,20 @@ body {
 }
 
 .card-border {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgb(var(--color-ink) / 0.1);
 }
 
 .input-base {
-  background-color: #181818;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgb(var(--color-surface));
+  border: 1px solid rgb(var(--color-ink) / 0.2);
   border-radius: 8px;
   padding: 12px;
-  color: #fff;
+  color: rgb(var(--color-ink));
   width: 100%;
+}
+
+.input-base::placeholder {
+  color: rgb(var(--color-ink) / 0.4);
 }
 
 .input-base:focus {
@@ -35,3 +62,17 @@ body {
   outline-offset: 4px;
   border-color: #1db954;
 }
+
+.input-invalid {
+  border-color: #ff4444;
+}
+
+.input-invalid:focus {
+  outline-color: #ff4444;
+  border-color: #ff4444;
+}
+
+.input-valid {
+  border-color: #1db954;
+}
+

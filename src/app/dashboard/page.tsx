@@ -7,13 +7,15 @@ import AuditList from "@/components/dashboard/AuditList";
 import DashboardState from "@/components/dashboard/DashboardState";
 import { useAudits } from "@/lib/hooks/useAudits";
 import { averageScore, totalRemoved } from "@/lib/utils/dashboard";
-import { MOCK_USER } from "@/lib/mock/dashboardMock";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 export default function DashboardPage() {
   // Demo switcher to preview Loading / Empty / Error states from the PRD.
   // Remove once wired to Firebase Auth + Firestore.
   const [preview, setPreview] = useState<"data" | "empty" | "error">("data");
   const query = useAudits(preview);
+  const { user, initializing } = useAuth();
+  const displayName = user?.full_name ?? "there";
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6">
@@ -21,7 +23,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-lexend text-3xl font-bold tracking-tight sm:text-4xl">
-            Welcome back, {MOCK_USER.full_name} 👋
+            Welcome back, {initializing ? "…" : displayName} 👋
           </h1>
           <p className="mt-2 max-w-xl text-sm text-white/60 sm:text-base">
             Here&apos;s your scan history and Digital Hygiene progress. Start a new audit
@@ -59,7 +61,7 @@ export default function DashboardPage() {
       {query.status === "loading" && <DashboardState variant="loading" />}
 
       {query.status === "error" && (
-        <DashboardState variant="error" onRetry={() => setPreview("data")} />
+        <DashboardState variant="error" onRetry={query.retry} />
       )}
 
       {query.status === "success" && query.audits.length === 0 && (
