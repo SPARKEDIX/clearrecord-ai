@@ -11,10 +11,13 @@ export default function Header() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const handleSignOut = () => {
-    logout();
-    setOpen(false);
-    router.push("/");
+  const handleSignOut = async () => {
+    try {
+      await logout();
+    } finally {
+      setOpen(false);
+      router.push("/");
+    }
   };
 
   return (

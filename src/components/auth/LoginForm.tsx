@@ -11,7 +11,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginForm() {
   const router = useRouter();
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { login, signup, loginWithGoogle, authError, clearAuthError } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -34,6 +34,7 @@ export default function LoginForm() {
     e.preventDefault();
     setTouched(true);
     setFormError(null);
+    clearAuthError();
     if (!canSubmit || pending) return;
     setPending("email");
     try {
@@ -41,7 +42,7 @@ export default function LoginForm() {
       else await signup(fullName.trim(), email.trim(), password);
       router.push("/dashboard");
     } catch {
-      setFormError("Something went wrong. Please try again.");
+      setFormError(authError?.message ?? "Something went wrong. Please try again.");
     } finally {
       setPending(null);
     }
@@ -49,12 +50,13 @@ export default function LoginForm() {
 
   const handleGoogle = async () => {
     setFormError(null);
+    clearAuthError();
     setPending("google");
     try {
       await loginWithGoogle();
       router.push("/dashboard");
     } catch {
-      setFormError("Google sign-in failed. Please try again.");
+      setFormError(authError?.message ?? "Google sign-in failed. Please try again.");
     } finally {
       setPending(null);
     }
