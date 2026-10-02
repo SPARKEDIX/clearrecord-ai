@@ -42,6 +42,9 @@ export default function Header() {
           <Link href="/score" className="transition hover:text-white">
             Score
           </Link>
+          <Link href="/review" className="transition hover:text-white">
+            Review
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">

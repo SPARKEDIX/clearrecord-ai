@@ -11,7 +11,7 @@ import {
   updateProfile,
   type User as FirebaseUser
 } from "firebase/auth";
-import { auth } from "@/lib/firebase/client";
+import { getFirebaseAuth, isFirebaseConfigured } from "@/lib/firebase/client";
 
 export interface AuthUser {
   id: string;
@@ -125,8 +125,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authError, setAuthError] = useState<AuthError | null>(null);
 
   useEffect(() => {
+    // onAuthStateChanged touches window/localStorage, so it must only run in
+    // the browser. Skipping it during SSR/prerender also keeps `next build` green
+    // when the Firebase env vars are not present on the build machine.
+    if (typeof window === "undefined") return;
+    if (!isFirebaseConfigured()) {
+      setInitializing(false);
+      return;
+    }
+
+    const instance = getFirebaseAuth();
     const unsub = onAuthStateChanged(
-      auth,
+      instance,
       (fb) => {
         if (fb) {
           const next = toAuthUser(fb);
@@ -146,7 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     setAuthError(null);
     try {
-      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
       const next = toAuthUser(cred.user);
       persist(next);
       setUser(next);
@@ -161,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signup = useCallback(async (fullName: string, email: string, password: string) => {
     setAuthError(null);
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
       const trimmed = fullName.trim();
       if (trimmed && cred.user.displayName !== trimmed) {
         try {
@@ -184,7 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithGoogle = useCallback(async () => {
     setAuthError(null);
     try {
-      const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+      const cred = await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
       const next = toAuthUser(cred.user);
       persist(next);
       setUser(next);
@@ -199,7 +209,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     setAuthError(null);
     try {
-      await signOut(auth);
+      await signOut(getFirebaseAuth());
     } finally {
       persist(null);
       setUser(null);
