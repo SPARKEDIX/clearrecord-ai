@@ -1,15 +1,22 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 
-// Your web app's Firebase configuration.
+// Firebase config comes from env vars (see .env.example).
+// All keys use the NEXT_PUBLIC_ prefix so Next.js exposes them to the browser.
 const firebaseConfig = {
-  apiKey: "AIzaSyBSp4NdZpV0neL2ReBs2yMAwL0w7EfFMCI",
-  authDomain: "studio-v44n4.firebaseapp.com",
-  projectId: "studio-v44n4",
-  storageBucket: "studio-v44n4.firebasestorage.app",
-  messagingSenderId: "911617360858",
-  appId: "1:911617360858:web:239c2e90ef580ac9f9f6e3"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
+
+if (!firebaseConfig.apiKey || !firebaseConfig.appId) {
+  throw new Error(
+    "Missing Firebase config. Copy .env.example to .env.local and fill in your Firebase Console values."
+  );
+}
 
 let app: FirebaseApp;
 let auth: Auth;

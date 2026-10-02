@@ -5,7 +5,8 @@ out/
 
 # ---> Env
 .env*.local
-.env.production
+.env
+!.env.example
 
 # ---> Firebase
 .firebase/
